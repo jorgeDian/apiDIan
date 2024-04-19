@@ -1,13 +1,14 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from pymongo import MongoClient
+from bson import ObjectId
 
 app = Flask(__name__)
 CORS(app)
 
 # Conexión a la base de datos MongoDB
-client = MongoClient('mongodb+srv://jordedian213:jordedian213@cluster0.ffmtk6k.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
-db = client['flask_db']  # Nombre de tu base de datos
+client = MongoClient('mongodb+srv://camilo:bLnRuVtBKoXsczqd@cluster0.ffmtk6k.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+db = client['Cluster0']  # Nombre de tu base de datos
 collection = db['data']  # Nombre de tu colección
 
 @app.route('/', methods=['POST'])
@@ -30,7 +31,7 @@ def get_json_data():
         cursor = collection.find({})
         
         # Convertir los documentos a una lista de diccionarios
-        json_data = [document for document in cursor]
+        json_data = [{**document, '_id': str(document['_id'])} for document in cursor]
         
         return jsonify(json_data)
     except Exception as e:
