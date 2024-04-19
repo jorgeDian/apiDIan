@@ -11,7 +11,7 @@ client = MongoClient('mongodb+srv://camilo:bLnRuVtBKoXsczqd@cluster0.ffmtk6k.mon
 db = client['Cluster0']  # Nombre de tu base de datos
 collection = db['data']  # Nombre de tu colección
 
-@app.route('/task', methods=['POST'])
+@app.route('/', methods=['POST'])
 def save_json():
     try:
         # Obtener los datos JSON de la solicitud
@@ -24,7 +24,7 @@ def save_json():
     except Exception as e:
         return jsonify({'error': str(e)})
 
-@app.route('/task', methods=['GET'])
+@app.route('/', methods=['GET'])
 def get_json_data():
     try:
         # Obtener todos los documentos de la colección
