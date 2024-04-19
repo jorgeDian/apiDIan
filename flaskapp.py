@@ -1,43 +1,38 @@
 from flask import Flask, jsonify, request
-import os
 from flask_cors import CORS
-import json
+from pymongo import MongoClient
 
 app = Flask(__name__)
 CORS(app)
 
+# Conexión a la base de datos MongoDB
+client = MongoClient('mongodb+srv://jordedian213:jordedian213@cluster0.ffmtk6k.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+db = client['flask_db']  # Nombre de tu base de datos
+collection = db['data']  # Nombre de tu colección
+
 @app.route('/', methods=['POST'])
 def save_json():
     try:
-        # Get the JSON data from the request
+        # Obtener los datos JSON de la solicitud
         json_data = request.json
         
-        # Change the destination directory as per your requirement
-        destination = os.path.join('uploads', 'data.json')
+        # Insertar los datos JSON en la colección de MongoDB
+        result = collection.insert_one(json_data)
         
-        # Save the JSON data to a file
-        with open(destination, 'w') as file:
-            json.dump(json_data, file)
-        
-        return jsonify({'message': 'JSON data saved successfully', 'path': destination})
+        return jsonify({'message': 'JSON data saved successfully', 'inserted_id': str(result.inserted_id)})
     except Exception as e:
         return jsonify({'error': str(e)})
 
 @app.route('/', methods=['GET'])
 def get_json_data():
     try:
-        # Change the destination directory as per your requirement
-        destination = os.path.join('uploads', 'data.json')
+        # Obtener todos los documentos de la colección
+        cursor = collection.find({})
         
-        # Check if the file exists
-        if os.path.exists(destination):
-            # Read the JSON data from the file
-            with open(destination, 'r') as file:
-                json_data = json.load(file)
-            
-            return jsonify(json_data)
-        else:
-            return jsonify({'message': 'File not found'})
+        # Convertir los documentos a una lista de diccionarios
+        json_data = [document for document in cursor]
+        
+        return jsonify(json_data)
     except Exception as e:
         return jsonify({'error': str(e)})
 
